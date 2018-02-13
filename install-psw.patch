@@ -1,8 +1,8 @@
 diff --git a/linux/installer/bin/install-sgx-psw.bin.tmpl b/linux/installer/bin/install-sgx-psw.bin.tmpl
-index 10a8952..405a4cb 100755
+index 4922e75..c696654 100755
 --- a/linux/installer/bin/install-sgx-psw.bin.tmpl
 +++ b/linux/installer/bin/install-sgx-psw.bin.tmpl
-@@ -30,31 +30,10 @@
+@@ -30,34 +30,10 @@
  #
  #
  
@@ -10,13 +10,16 @@ index 10a8952..405a4cb 100755
 -if [[ $? != "0" ]]; then
 -    modinfo isgx &> /dev/null
 -    if [[ $? != "0" ]]; then
--        lsmod | grep isgx &> /dev/null
--        if [[ $? = "0" ]]; then
--            echo "Warning: You did not follow the document to install the driver package"
--            echo
--        else
--            echo "Please install the driver package before the PSW package"
--            exit 4
+-        modinfo intel_sgx &> /dev/null
+-        if [[ $? != "0" ]]; then
+-            lsmod | grep 'isgx\|intel_sgx' &> /dev/null
+-            if [[ $? = "0" ]]; then
+-                echo "Warning: You did not follow the document to install the driver package"
+-                echo
+-            else
+-                echo "Please install the driver package before the PSW package"
+-                exit 4
+-            fi
 -        fi
 -    fi
 -fi
