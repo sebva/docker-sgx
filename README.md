@@ -38,6 +38,14 @@ $ docker build -t sampleenclave .
 
 **Running in container**
 
+If your system uses MEI kernel module (/dev/mei0 is available), you should run the application using the following command:
+
 ```shell
 $ docker run --device /dev/isgx --device /dev/mei0 sampleenclave
+```
+
+If your system uses DAL kernel module (/dev/dal0 is available), you should run the application using the following command:
+
+```shell
+$ docker run --device /dev/isgx --device /dev/dal0 sampleenclave
 ```
