@@ -16,14 +16,14 @@ RUN wget --progress=dot:mega -O - https://github.com/01org/dynamic-application-l
 
 COPY install-psw.patch ./
 
-RUN wget --progress=dot:mega -O - https://github.com/01org/linux-sgx/archive/sgx_2.1.2.tar.gz | tar -xz && \
-    cd linux-sgx-sgx_2.1.2 && \
+RUN wget --progress=dot:mega -O - https://github.com/01org/linux-sgx/archive/sgx_2.2.tar.gz | tar -xz && \
+    cd linux-sgx-sgx_2.2 && \
     patch -p1 -i ../install-psw.patch && \
     ./download_prebuilt.sh 2> /dev/null && \
     make -s -j$(nproc) sdk_install_pkg psw_install_pkg && \
-    ./linux/installer/bin/sgx_linux_x64_sdk_2.1.102.43402.bin --prefix=/opt/intel && \
-    ./linux/installer/bin/sgx_linux_x64_psw_2.1.102.43402.bin && \
-    cd .. && rm -rf linux-sgx-sgx_2.1.2
+    ./linux/installer/bin/sgx_linux_x64_sdk_2.2.100.45311.bin --prefix=/opt/intel && \
+    ./linux/installer/bin/sgx_linux_x64_psw_2.2.100.45311.bin && \
+    cd .. && rm -rf linux-sgx-sgx_2.2
 
 WORKDIR /usr/src/app
 
