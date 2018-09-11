@@ -8,22 +8,22 @@ RUN wget --progress=dot:mega -O iclsclient.rpm http://registrationcenter-downloa
     alien --scripts -i iclsclient.rpm && \
     rm iclsclient.rpm
 
-RUN wget --progress=dot:mega -O - https://github.com/01org/dynamic-application-loader-host-interface/archive/3dd95507339b14c342407c6c57646cc23a13a43a.tar.gz | tar -xz && \
-    cd dynamic-application-loader-host-interface-3dd95507339b14c342407c6c57646cc23a13a43a && \
+RUN wget --progress=dot:mega -O - https://github.com/01org/dynamic-application-loader-host-interface/archive/97c27a479f0b52a39740c7174a43aff8940b9914.tar.gz | tar -xz && \
+    cd dynamic-application-loader-host-interface-97c27a479f0b52a39740c7174a43aff8940b9914 && \
     cmake . -DCMAKE_BUILD_TYPE=Release -DINIT_SYSTEM=SysVinit && \
     make install && \
-    cd .. && rm -rf dynamic-application-loader-host-interface-3dd95507339b14c342407c6c57646cc23a13a43a
+    cd .. && rm -rf dynamic-application-loader-host-interface-97c27a479f0b52a39740c7174a43aff8940b9914
 
 COPY install-psw.patch ./
 
-RUN wget --progress=dot:mega -O - https://github.com/01org/linux-sgx/archive/sgx_2.1.2.tar.gz | tar -xz && \
-    cd linux-sgx-sgx_2.1.2 && \
+RUN wget --progress=dot:mega -O - https://github.com/01org/linux-sgx/archive/sgx_2.2.tar.gz | tar -xz && \
+    cd linux-sgx-sgx_2.2 && \
     patch -p1 -i ../install-psw.patch && \
     ./download_prebuilt.sh 2> /dev/null && \
     make -s -j$(nproc) sdk_install_pkg psw_install_pkg && \
-    ./linux/installer/bin/sgx_linux_x64_sdk_2.1.102.43402.bin --prefix=/opt/intel && \
-    ./linux/installer/bin/sgx_linux_x64_psw_2.1.102.43402.bin && \
-    cd .. && rm -rf linux-sgx-sgx_2.1.2
+    ./linux/installer/bin/sgx_linux_x64_sdk_2.2.100.45311.bin --prefix=/opt/intel && \
+    ./linux/installer/bin/sgx_linux_x64_psw_2.2.100.45311.bin && \
+    cd .. && rm -rf linux-sgx-sgx_2.2
 
 WORKDIR /usr/src/app
 
