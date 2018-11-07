@@ -15,6 +15,7 @@ Instructions:
 * sgx_2.1.2
 * sgx_2.2
 * sgx_2.3
+* sgx_2.3.1
 
 ## Example Dockerfile
 
