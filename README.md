@@ -25,7 +25,7 @@ Example using `SampleEnclave` shipped with the official SDK
 **Dockerfile**
 
 ```Dockerfile
-FROM sebvaucher/sgx-base:sgx_2.3
+FROM sebvaucher/sgx-base:sgx_2.4
 
 COPY . ./
 RUN make SGX_DEBUG=0 SGX_PRERELEASE=1 SGX_MODE=HW
