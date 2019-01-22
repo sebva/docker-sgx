@@ -8,7 +8,7 @@ RUN wget --progress=dot:mega -O iclsclient.rpm http://registrationcenter-downloa
     alien --scripts -i iclsclient.rpm && \
     rm iclsclient.rpm
 
-RUN wget --progress=dot:mega -O - https://github.com/01org/dynamic-application-loader-host-interface/archive/97c27a479f0b52a39740c7174a43aff8940b9914.tar.gz | tar -xz && \
+RUN wget --progress=dot:mega -O - https://github.com/intel/dynamic-application-loader-host-interface/archive/97c27a479f0b52a39740c7174a43aff8940b9914.tar.gz | tar -xz && \
     cd dynamic-application-loader-host-interface-97c27a479f0b52a39740c7174a43aff8940b9914 && \
     cmake . -DCMAKE_BUILD_TYPE=Release -DINIT_SYSTEM=SysVinit && \
     make install && \
@@ -16,7 +16,7 @@ RUN wget --progress=dot:mega -O - https://github.com/01org/dynamic-application-l
 
 COPY install-psw.patch ./
 
-RUN wget --progress=dot:mega -O - https://github.com/01org/linux-sgx/archive/sgx_2.4.tar.gz | tar -xz && \
+RUN wget --progress=dot:mega -O - https://github.com/intel/linux-sgx/archive/sgx_2.4.tar.gz | tar -xz && \
     cd linux-sgx-sgx_2.4 && \
     patch -p1 -i ../install-psw.patch && \
     ./download_prebuilt.sh 2> /dev/null && \
