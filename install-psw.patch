@@ -1,24 +1,24 @@
 diff --git a/linux/installer/bin/install-sgx-psw.bin.tmpl b/linux/installer/bin/install-sgx-psw.bin.tmpl
-index 4922e75..c696654 100755
+index 3510e97c..751831ab 100755
 --- a/linux/installer/bin/install-sgx-psw.bin.tmpl
 +++ b/linux/installer/bin/install-sgx-psw.bin.tmpl
 @@ -30,34 +30,10 @@
  #
  #
  
--grep intel_sgx /lib/modules/$(uname -r)/modules.builtin &> /dev/null
+-grep 'sgx\.ko$\|intel_sgx\.ko$' /lib/modules/$(uname -r)/modules.builtin &> /dev/null
 -if [[ $? != "0" ]]; then
--    modinfo isgx &> /dev/null
+-    /sbin/modinfo isgx &> /dev/null
 -    if [[ $? != "0" ]]; then
--        modinfo intel_sgx &> /dev/null
+-        /sbin/modinfo intel_sgx &> /dev/null
 -        if [[ $? != "0" ]]; then
 -            lsmod | grep 'isgx\|intel_sgx' &> /dev/null
 -            if [[ $? = "0" ]]; then
--                echo "Warning: You did not follow the document to install the driver package"
+-                echo "Warning: You did not follow the document to install the driver package."
 -                echo
--            else
--                echo "Please install the driver package before the PSW package"
--                exit 4
+-            elif [[ ! -e /dev/isgx ]] && [[ ! -e /dev/sgx ]]; then
+-                echo -e "\033[31;49;1mWarning: You may need to activate the SGX module if SGX is enabled in the kernel (e.g., sudo modprobe sgx) or download and install the SGX driver if the kernel doesn't have SGX support.\033[39;49;0m"
+-                echo
 -            fi
 -        fi
 -    fi
@@ -37,3 +37,110 @@ index 4922e75..c696654 100755
  PKG_ARCH=@arch@
  ARCH=$(uname -m)
  
+diff --git a/linux/installer/common/libsgx-enclave-common/install.sh b/linux/installer/common/libsgx-enclave-common/install.sh
+index 296879af..de60545a 100755
+--- a/linux/installer/common/libsgx-enclave-common/install.sh
++++ b/linux/installer/common/libsgx-enclave-common/install.sh
+@@ -33,11 +33,6 @@
+ 
+ set -e 
+ 
+-if test $(id -u) -ne 0; then
+-    echo "Root privilege is required."
+-    exit 1
+-fi
+-
+ SCRIPT_DIR=$(dirname "$0")
+ source ${SCRIPT_DIR}/installConfig
+ 
+@@ -66,43 +61,6 @@ mkdir -p /var/run/aesmd
+ chown -R aesmd:aesmd /var/run/aesmd
+ chmod 0755 /var/run/aesmd
+ 
+-if [ -d /run/systemd/system ]; then
+-    systemctl stop aesmd &> /dev/null || echo
+-    AESMD_NAME=aesmd.service
+-    AESMD_TEMP=$AESM_PATH/$AESMD_NAME
+-    if [ -d /lib/systemd/system ]; then
+-        AESMD_DEST=/lib/systemd/system/$AESMD_NAME
+-    else
+-        AESMD_DEST=/usr/lib/systemd/system/$AESMD_NAME
+-    fi
+-    echo -n "Installing $AESMD_NAME service ..."
+-    sed -e "s:@aesm_folder@:$AESM_PATH:" \
+-        $AESMD_TEMP > $AESMD_DEST
+-    chmod 0644 $AESMD_DEST
+-    systemctl enable aesmd
+-    retval=$?
+-elif [ -d /etc/init/ ]; then
+-    /sbin/initctl stop aesmd &> /dev/null || echo
+-    AESMD_NAME=aesmd.conf
+-    AESMD_TEMP=$AESM_PATH/$AESMD_NAME
+-    AESMD_DEST=/etc/init/$AESMD_NAME
+-    echo -n "Installing $AESMD_NAME service ..."
+-    sed -e "s:@aesm_folder@:$AESM_PATH:" \
+-        $AESMD_TEMP > $AESMD_DEST
+-    chmod 0644 $AESMD_DEST
+-    /sbin/initctl reload-configuration
+-    retval=$?
+-else
+-    echo " failed."
+-    echo "Unsupported platform - neither systemctl nor initctl is found."
+-    exit 5
+-fi
+-
+-if test $retval -ne 0; then
+-    echo "$rcmngr failed to install $AESMD_NAME."
+-    exit 6
+-fi
+-
+ echo " done."
+ 
+ 
+diff --git a/linux/installer/common/psw/install.sh b/linux/installer/common/psw/install.sh
+index 59f3ed61..b3255675 100755
+--- a/linux/installer/common/psw/install.sh
++++ b/linux/installer/common/psw/install.sh
+@@ -63,42 +63,6 @@ mkdir -p /var/run/aesmd
+ chown -R aesmd:aesmd /var/run/aesmd
+ chmod 0755 /var/run/aesmd
+ 
+-if [ -d /run/systemd/system ]; then
+-    systemctl stop aesmd &> /dev/null || echo
+-    AESMD_NAME=aesmd.service
+-    AESMD_TEMP=$AESM_PATH/$AESMD_NAME
+-    if [ -d /lib/systemd/system ]; then
+-        AESMD_DEST=/lib/systemd/system/$AESMD_NAME
+-    else
+-        AESMD_DEST=/usr/lib/systemd/system/$AESMD_NAME
+-    fi
+-    echo -n "Installing $AESMD_NAME service ..."
+-    sed -e "s:@aesm_folder@:$AESM_PATH:" \
+-        $AESMD_TEMP > $AESMD_DEST
+-    chmod 0644 $AESMD_DEST
+-    rm -f $AESMD_TEMP
+-    rm -f $AESM_PATH/aesmd.conf
+-    systemctl enable aesmd
+-    retval=$?
+-elif [ -d /etc/init/ ]; then
+-    /sbin/initctl stop aesmd &> /dev/null || echo
+-    AESMD_NAME=aesmd.conf
+-    AESMD_TEMP=$AESM_PATH/$AESMD_NAME
+-    AESMD_DEST=/etc/init/$AESMD_NAME
+-    echo -n "Installing $AESMD_NAME service ..."
+-    sed -e "s:@aesm_folder@:$AESM_PATH:" \
+-        $AESMD_TEMP > $AESMD_DEST
+-    chmod 0644 $AESMD_DEST
+-    rm -f $AESMD_TEMP
+-    rm -f $AESM_PATH/aesmd.service
+-    /sbin/initctl reload-configuration
+-    retval=$?
+-else
+-    echo " failed."
+-    echo "Unsupported platform - neither systemctl nor initctl is found."
+-    exit 5
+-fi
+-
+ if test $retval -ne 0; then
+     echo "$rcmngr failed to install $AESMD_NAME."
+     exit 6
