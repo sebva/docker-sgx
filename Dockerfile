@@ -16,8 +16,8 @@ RUN wget --progress=dot:mega -O - https://github.com/intel/dynamic-application-l
 
 COPY install-psw.patch ./
 
-RUN git clone https://github.com/intel/linux-sgx && \
-    cd linux-sgx && git checkout sgx_2.5 && \
+RUN git clone -b sgx_2.5 --depth 1 https://github.com/intel/linux-sgx && \
+    cd linux-sgx && \
     patch -p1 -i ../install-psw.patch && \
     ./download_prebuilt.sh 2> /dev/null && \
     make -s -j$(nproc) sdk_install_pkg psw_install_pkg && \
