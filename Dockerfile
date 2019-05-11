@@ -8,11 +8,11 @@ RUN wget --progress=dot:mega -O iclsclient.rpm http://registrationcenter-downloa
     alien --scripts -i iclsclient.rpm && \
     rm iclsclient.rpm
 
-RUN wget --progress=dot:mega -O - https://github.com/intel/dynamic-application-loader-host-interface/archive/01997d9b66cfbbb871cdd9a9caf80f04592dc27e.tar.gz | tar -xz && \
-    cd dynamic-application-loader-host-interface-01997d9b66cfbbb871cdd9a9caf80f04592dc27e && \
+RUN wget --progress=dot:mega -O - https://github.com/intel/dynamic-application-loader-host-interface/archive/072d233296c15d0dcd1fb4570694d0244729f87b.tar.gz | tar -xz && \
+    cd dynamic-application-loader-host-interface-072d233296c15d0dcd1fb4570694d0244729f87b && \
     cmake . -DCMAKE_BUILD_TYPE=Release -DINIT_SYSTEM=SysVinit && \
     make install && \
-    cd .. && rm -rf dynamic-application-loader-host-interface-01997d9b66cfbbb871cdd9a9caf80f04592dc27e
+    cd .. && rm -rf dynamic-application-loader-host-interface-072d233296c15d0dcd1fb4570694d0244729f87b
 
 COPY install-psw.patch ./
 
